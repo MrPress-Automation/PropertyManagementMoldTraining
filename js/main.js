@@ -35,6 +35,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // State-by-state mold law search (FAQ page)
+  var stateSearchInput = document.getElementById('stateSearchInput');
+  var stateLawGrid = document.getElementById('stateLawGrid');
+  var stateSearchEmpty = document.getElementById('stateSearchEmpty');
+
+  if (stateSearchInput && stateLawGrid) {
+    var stateCards = Array.prototype.slice.call(stateLawGrid.querySelectorAll('.state-law-card'));
+    stateSearchInput.addEventListener('input', function () {
+      var query = stateSearchInput.value.trim().toLowerCase();
+      var visibleCount = 0;
+      stateCards.forEach(function (card) {
+        var matches = card.textContent.toLowerCase().indexOf(query) !== -1;
+        card.hidden = !matches;
+        if (matches) visibleCount++;
+      });
+      if (stateSearchEmpty) stateSearchEmpty.hidden = visibleCount !== 0;
+    });
+  }
+
   // Enroll form (seat count only; Stripe checkout wires in later)
   var enrollForm = document.getElementById('enrollForm');
   var formSuccess = document.getElementById('formSuccess');
