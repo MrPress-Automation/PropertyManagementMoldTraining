@@ -34,37 +34,45 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Buyer type toggle (Individual / Business): display only, pricing doesn't change
-  var buyerTypeBtns = document.querySelectorAll('.buyer-type-btn');
-  var bulkPricing = document.getElementById('bulkPricing');
-  if (buyerTypeBtns.length && bulkPricing) {
-    buyerTypeBtns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        buyerTypeBtns.forEach(function (other) {
-          other.classList.remove('active');
-          other.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-        bulkPricing.hidden = btn.dataset.buyerType !== 'business';
-      });
-    });
-  }
-
   // Enroll form (seat count only; Stripe checkout wires in later)
   var enrollForm = document.getElementById('enrollForm');
   var formSuccess = document.getElementById('formSuccess');
   var seatsInput = document.getElementById('seats');
   var formTotal = document.getElementById('formTotal');
+  var priceOriginal = document.getElementById('priceOriginal');
+  var priceAmount = document.getElementById('priceAmount');
+
+  // Bulk seat pricing applies automatically, individual or business
+  var bulkTiers = [
+    { min: 101, price: 218.49 },
+    { min: 51, price: 220.79 },
+    { min: 21, price: 223.09 },
+    { min: 11, price: 225.39 },
+    { min: 2, price: 227.69 }
+  ];
 
   if (enrollForm && seatsInput && formTotal) {
-    var pricePerSeat = parseFloat(enrollForm.dataset.pricePerSeat);
-    var updateTotal = function () {
+    var basePrice = parseFloat(enrollForm.dataset.pricePerSeat);
+    var pricePerSeatFor = function (seats) {
+      for (var i = 0; i < bulkTiers.length; i++) {
+        if (seats >= bulkTiers[i].min) return bulkTiers[i].price;
+      }
+      return basePrice;
+    };
+    var updatePricing = function () {
       var seats = Math.max(1, parseInt(seatsInput.value, 10) || 1);
+      var pricePerSeat = pricePerSeatFor(seats);
+      var discounted = pricePerSeat < basePrice;
+
+      if (priceOriginal && priceAmount) {
+        priceOriginal.hidden = !discounted;
+        priceOriginal.textContent = '$' + basePrice.toFixed(2);
+        priceAmount.textContent = '$' + pricePerSeat.toFixed(2);
+      }
       formTotal.textContent = 'Total: $' + (seats * pricePerSeat).toFixed(2);
     };
-    seatsInput.addEventListener('input', updateTotal);
-    updateTotal();
+    seatsInput.addEventListener('input', updatePricing);
+    updatePricing();
   }
 
   if (enrollForm && formSuccess) {
