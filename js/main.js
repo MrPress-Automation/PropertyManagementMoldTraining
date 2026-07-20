@@ -89,7 +89,8 @@ document.addEventListener('DOMContentLoaded', function () {
         priceOriginal.textContent = '$' + basePrice.toFixed(2);
         priceAmount.textContent = '$' + pricePerSeat.toFixed(2);
       }
-      formTotal.textContent = 'Total: $' + (seats * pricePerSeat).toFixed(2);
+      var totalFormatted = (seats * pricePerSeat).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      formTotal.textContent = 'Total: $' + totalFormatted;
     };
     seatsInput.addEventListener('input', updatePricing);
     updatePricing();
