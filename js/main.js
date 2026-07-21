@@ -35,23 +35,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Course tabs (Curriculum & Who It's For sections switch content per course)
-  document.querySelectorAll('.course-tabs').forEach(function (tabs) {
-    var panels = tabs.parentElement.querySelectorAll('.course-panel');
-    tabs.querySelectorAll('.course-tab').forEach(function (tab) {
+  // One shared set of course tabs drives both Curriculum and Who It's For panels
+  var infoCourseTabs = document.getElementById('infoCourseTabs');
+  if (infoCourseTabs) {
+    var infoPanels = document.querySelectorAll('#curriculum .course-panel, #audience .course-panel');
+    infoCourseTabs.querySelectorAll('.course-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
-        tabs.querySelectorAll('.course-tab').forEach(function (other) {
+        infoCourseTabs.querySelectorAll('.course-tab').forEach(function (other) {
           other.classList.remove('active');
           other.setAttribute('aria-selected', 'false');
         });
         tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
-        panels.forEach(function (panel) {
+        infoPanels.forEach(function (panel) {
           panel.classList.toggle('active', panel.dataset.panel === tab.dataset.panel);
         });
       });
     });
-  });
+  }
 
   // State-by-state mold law search (FAQ page)
   var stateSearchInput = document.getElementById('stateSearchInput');
